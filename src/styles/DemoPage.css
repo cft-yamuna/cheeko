@@ -731,8 +731,45 @@
 .demo-page .inserting-card-inner .card-label { font-size: 0.82rem; color: white; font-weight: 800; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 
 /* Card slot */
-.demo-page .card-slot { width: 80px; height: 7px; margin: 0 auto; }
-.demo-page .slot-opening { width: 100%; height: 100%; background: #9e2a22; border-radius: 0 0 4px 4px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+/* Peeking card — half in slot, half sticking out above */
+.demo-page .peeking-card {
+  position: absolute;
+  top: -70px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 55%;
+  height: 92px;
+  z-index: -1;
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+  filter: drop-shadow(0 -4px 12px rgba(0,0,0,0.25));
+  animation: peekIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes peekIn {
+  0% { top: -10px; opacity: 0; }
+  100% { top: -70px; opacity: 1; }
+}
+
+.demo-page .peeking-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+
+.demo-page .peeking-card-gradient {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.demo-page .card-slot { width: 75%; height: 10px; margin: 0 auto; position: relative; z-index: 1; }
+.demo-page .slot-opening { width: 100%; height: 100%; background: #7a1e18; border-radius: 0 0 6px 6px; box-shadow: inset 0 3px 6px rgba(0,0,0,0.6), 0 1px 2px rgba(255,255,255,0.08); }
 
 /* LEDs */
 .demo-page .device-leds { display: flex; justify-content: center; gap: 14px; margin-top: 14px; margin-bottom: 4px; }

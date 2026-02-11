@@ -92,10 +92,18 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
       <div className="device-3d-wrapper">
         {/* Main device body */}
         <div className={`device ${isPlaying ? 'playing' : ''}`}>
-          {/* Card Slot */}
-          <div className="card-slot">
-            <div className="slot-opening" />
-          </div>
+          {/* Card peeking out of slot */}
+          {insertedCard && data && (
+            <div className="peeking-card">
+              {data.cardImage ? (
+                <img src={data.cardImage} alt={data.title} className="peeking-card-img" draggable={false} />
+              ) : (
+                <div className="peeking-card-gradient" style={{ background: data.bg }}>
+                  <span>{data.icon}</span>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* 3 dark indicator dots */}
           <div className="device-leds">
