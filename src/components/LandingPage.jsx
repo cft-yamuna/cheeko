@@ -283,7 +283,7 @@ export default function LandingPage({ onStartDemo, onCart }) {
                   <input
                     id="childName"
                     type="text"
-                    placeholder="Enter name\u2026"
+                    placeholder="Enter name"
                     value={demoName}
                     onChange={(e) => setDemoName(e.target.value)}
                     required

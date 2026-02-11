@@ -71,15 +71,7 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
 
   return (
     <div className="device-container" ref={containerRef}>
-      {/* Inserting/Ejecting Card */}
-      {(cardAnim || insertedCard) && data && (
-        <div className={`inserting-card ${cardAnim}`}>
-          <div className="inserting-card-inner" style={{ background: data.bg }}>
-            <div className="card-icon">{data.icon}</div>
-            <div className="card-label">{data.title}</div>
-          </div>
-        </div>
-      )}
+      {/* Card insertion handled by flying arc animation in DemoPage */}
 
       {/* Particles */}
       {particles.map((p) => (
@@ -98,9 +90,6 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
 
       {/* 3D Device */}
       <div className="device-3d-wrapper">
-        {/* Left shadow edge for 3D depth */}
-        <div className="device-shadow-edge" />
-
         {/* Main device body */}
         <div className={`device ${isPlaying ? 'playing' : ''}`}>
           {/* Card Slot */}
@@ -148,21 +137,15 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
             <div className="knob-label">NEXT &#8635;</div>
           </div>
 
-          {/* Speaker grille - bottom left, diagonal dark lines */}
+          {/* Speaker grille - round shape lines */}
           <div className="device-speaker">
             <div className="speaker-grille">
-              <span /><span /><span /><span /><span /><span /><span />
+              <span /><span /><span /><span /><span /><span /><span /><span /><span />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sound Waves */}
-      <div className={`sound-waves ${isPlaying ? 'active' : ''}`}>
-        <div className="wave w1" />
-        <div className="wave w2" />
-        <div className="wave w3" />
-      </div>
     </div>
   );
 }
