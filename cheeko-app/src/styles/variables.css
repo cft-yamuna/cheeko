@@ -1,0 +1,26 @@
+:root {
+  --yellow: #FFD503;
+  --yellow-light: #FFF4D2;
+  --yellow-dark: #E6BF00;
+  --red: #E8423F;
+  --red-light: #FF6B68;
+  --orange: #FF8C42;
+  --dark: #2D2D2D;
+  --device-black: #1A1A1A;
+  --device-accent: #D4870E;
+  --screen-bg: #0a2a0a;
+  --screen-glow: #00ff44;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  overflow-x: hidden;
+  background: var(--yellow-light);
+  color: var(--dark);
+}

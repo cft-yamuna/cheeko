@@ -1,0 +1,639 @@
+/* ======== DEMO SCREEN ======== */
+.demo-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: linear-gradient(180deg, #1a0a2e 0%, #2d1b4e 30%, #16213e 100%);
+  color: white;
+  padding: 1rem;
+  animation: fadeIn 0.6s ease;
+}
+
+.demo-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1rem;
+  position: relative;
+}
+
+.demo-header .logo-text {
+  color: var(--yellow);
+  text-shadow: 2px 2px 0 #b8960a;
+}
+
+.demo-header .back-btn {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border-color: var(--yellow);
+  color: var(--yellow);
+}
+.demo-header .back-btn:hover {
+  background: var(--yellow);
+  color: var(--dark);
+}
+
+.user-greeting {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--yellow);
+  background: rgba(255,213,3,0.1);
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,213,3,0.3);
+}
+
+.demo-instruction {
+  text-align: center;
+  padding: 0.8rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--yellow);
+  animation: pulseInstruction 2s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+@keyframes pulseInstruction {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+.instruction-icon {
+  font-size: 1.3rem;
+  display: inline-block;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
+
+/* Demo Area Layout */
+.demo-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Card Shelves */
+.card-shelf {
+  flex: 0 0 200px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 20px;
+  padding: 1.2rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+}
+
+.shelf-title {
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+}
+
+.shelf-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* RFID Cards */
+.rfid-card {
+  border-radius: 14px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rfid-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 14px 14px 0 0;
+}
+
+.rfid-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.left-shelf .rfid-card:hover {
+  transform: translateX(8px) scale(1.03);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+}
+
+.right-shelf .rfid-card:hover {
+  transform: translateX(-8px) scale(1.03);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+}
+
+.rfid-card:active {
+  transform: scale(0.97) !important;
+}
+
+.rfid-card.inserted {
+  opacity: 0.3;
+  pointer-events: none;
+  transform: scale(0.95);
+}
+
+.card-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.card-label {
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Device Container */
+.device-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Inserting Card Animation */
+.inserting-card {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 100px;
+  border-radius: 10px;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.inserting-card.animating {
+  animation: insertCard 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.inserting-card.ejecting {
+  animation: ejectCard 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.inserting-card-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+}
+
+.inserting-card-inner .card-icon {
+  font-size: 2rem;
+}
+.inserting-card-inner .card-label {
+  font-size: 0.7rem;
+}
+
+@keyframes insertCard {
+  0% {
+    opacity: 1;
+    top: -100px;
+    transform: translateX(-50%) rotate(-5deg);
+  }
+  40% {
+    opacity: 1;
+    top: -60px;
+    transform: translateX(-50%) rotate(0deg);
+  }
+  70% {
+    opacity: 1;
+    top: -20px;
+    transform: translateX(-50%) rotate(0deg);
+  }
+  100% {
+    opacity: 0.6;
+    top: 5px;
+    transform: translateX(-50%) rotate(0deg);
+  }
+}
+
+@keyframes ejectCard {
+  0% {
+    opacity: 0.6;
+    top: 5px;
+    transform: translateX(-50%) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    top: -60px;
+    transform: translateX(-50%) rotate(3deg);
+  }
+  100% {
+    opacity: 0;
+    top: -120px;
+    transform: translateX(-50%) rotate(5deg);
+  }
+}
+
+/* The Device */
+.device {
+  width: 200px;
+  height: 360px;
+  background: linear-gradient(180deg, #222 0%, var(--device-black) 20%, #111 100%);
+  border-radius: 24px;
+  position: relative;
+  box-shadow:
+    0 0 0 3px #333,
+    0 20px 60px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.1),
+    0 0 100px rgba(212, 135, 14, 0.05);
+  overflow: visible;
+  padding: 10px;
+}
+
+.card-slot {
+  width: 70px;
+  height: 8px;
+  margin: 0 auto;
+  position: relative;
+  top: -4px;
+}
+
+.slot-opening {
+  width: 100%;
+  height: 100%;
+  background: #0a0a0a;
+  border-radius: 0 0 4px 4px;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+  border: 1px solid #333;
+  border-top: none;
+}
+
+.device-leds {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.led {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #3a2a00;
+  border: 1px solid #555;
+  transition: all 0.5s ease;
+}
+
+.led.active {
+  background: var(--device-accent);
+  box-shadow: 0 0 8px var(--device-accent), 0 0 20px rgba(212, 135, 14, 0.4);
+}
+
+/* Device Screen */
+.device-screen {
+  width: 150px;
+  height: 110px;
+  background: #050f05;
+  border-radius: 10px;
+  margin: 14px auto;
+  border: 3px solid #333;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);
+}
+
+.device-screen.on {
+  background: linear-gradient(180deg, #0a1a0a 0%, #0f2f0f 100%);
+  border-color: #444;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 0 20px rgba(0, 255, 68, 0.1);
+}
+
+.screen-off-text {
+  color: #1a3a1a;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 10px;
+}
+
+.screen-content {
+  display: flex;
+  text-align: center;
+  padding: 8px;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.screen-content.changing {
+  animation: screenChange 0.4s ease;
+}
+
+@keyframes screenChange {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.content-title {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--screen-glow);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  text-shadow: 0 0 10px var(--screen-glow);
+}
+
+.content-body {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #88ff88;
+  line-height: 1.3;
+  max-height: 60px;
+  overflow: hidden;
+  white-space: pre-line;
+}
+
+.content-index {
+  font-size: 0.55rem;
+  color: #44aa44;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+/* Knob Area */
+.device-knob-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.knob {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #e6a020, var(--device-accent), #8a5500);
+  cursor: pointer;
+  position: relative;
+  box-shadow:
+    0 4px 15px rgba(0,0,0,0.5),
+    inset 0 2px 4px rgba(255,255,255,0.3),
+    inset 0 -3px 6px rgba(0,0,0,0.4);
+  transition: all 0.2s ease;
+  border: 2px solid #a06800;
+}
+
+.knob:hover {
+  box-shadow:
+    0 4px 20px rgba(212, 135, 14, 0.5),
+    inset 0 2px 4px rgba(255,255,255,0.3),
+    inset 0 -3px 6px rgba(0,0,0,0.4);
+}
+
+.knob:active {
+  transform: scale(0.95);
+}
+
+.knob-indicator {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 12px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 2px;
+}
+
+.knob.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.knob-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Speaker */
+.device-speaker {
+  margin-top: 10px;
+}
+
+.speaker-grille {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  padding: 8px 30px;
+}
+
+.speaker-grille span {
+  height: 3px;
+  background: var(--device-accent);
+  border-radius: 2px;
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+  display: block;
+}
+
+.speaker-grille span:nth-child(1) { width: 40px; }
+.speaker-grille span:nth-child(2) { width: 50px; }
+.speaker-grille span:nth-child(3) { width: 60px; }
+.speaker-grille span:nth-child(4) { width: 55px; }
+.speaker-grille span:nth-child(5) { width: 45px; }
+.speaker-grille span:nth-child(6) { width: 35px; }
+
+.device.playing .speaker-grille span {
+  animation: speakerPulse 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes speakerPulse {
+  0% { opacity: 0.3; transform: scaleX(0.95); }
+  100% { opacity: 0.8; transform: scaleX(1.05); }
+}
+
+/* Sound Waves */
+.sound-waves {
+  position: absolute;
+  right: -40px;
+  top: 65%;
+  display: none;
+}
+
+.sound-waves.active {
+  display: block;
+}
+
+.wave {
+  border: 2px solid var(--device-accent);
+  border-radius: 50%;
+  position: absolute;
+  opacity: 0;
+  border-left-color: transparent;
+  border-bottom-color: transparent;
+}
+
+.sound-waves.active .wave {
+  animation: soundWave 1.5s ease-out infinite;
+}
+
+.w1 { width: 20px; height: 20px; animation-delay: 0s !important; }
+.w2 { width: 30px; height: 30px; top: -5px; left: 5px; animation-delay: 0.3s !important; }
+.w3 { width: 40px; height: 40px; top: -10px; left: 10px; animation-delay: 0.6s !important; }
+
+@keyframes soundWave {
+  0% { opacity: 0.8; transform: scale(0.5); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+/* Eject Area */
+.eject-area {
+  text-align: center;
+  padding: 1rem;
+}
+
+.eject-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--yellow);
+  background: rgba(255,213,3,0.1);
+  border: 2px solid rgba(255,213,3,0.3);
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.eject-btn:hover {
+  background: rgba(255,213,3,0.2);
+  border-color: var(--yellow);
+}
+
+/* Particles */
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.particle.burst {
+  animation: particleBurst 0.8s ease-out forwards;
+}
+
+@keyframes particleBurst {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 900px) {
+  .demo-area {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .card-shelf {
+    flex: none;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .shelf-cards {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .rfid-card {
+    flex: 0 0 calc(50% - 6px);
+  }
+
+  .left-shelf .rfid-card:hover,
+  .right-shelf .rfid-card:hover {
+    transform: translateY(-4px) scale(1.03) !important;
+  }
+}
+
+@media (max-width: 500px) {
+  .rfid-card {
+    flex: 0 0 100%;
+  }
+
+  .device {
+    width: 170px;
+    height: 310px;
+  }
+
+  .device-screen {
+    width: 130px;
+    height: 95px;
+  }
+
+  .user-greeting {
+    display: none;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

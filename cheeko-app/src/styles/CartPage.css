@@ -1,0 +1,415 @@
+/* ================================================
+   CHEEKO AI - Cart / Order Page
+   ================================================ */
+
+.cart-page {
+  min-height: 100vh;
+  background: var(--gray-50);
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-header {
+  background: rgba(249, 250, 251, 0.85);
+  border-bottom: 1px solid var(--gray-200);
+  backdrop-filter: blur(20px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.cart-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.cart-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  border: 1.5px solid var(--gray-200);
+  color: var(--dark-400);
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.cart-back-btn:hover {
+  background: var(--gray-100);
+  color: var(--dark);
+}
+
+.cart-logo {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.cart-logo .logo-cheeko {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--dark);
+}
+
+.cart-logo .logo-star {
+  color: var(--primary);
+  font-size: 0.9rem;
+  margin-top: -6px;
+}
+
+/* Main */
+.cart-main {
+  flex: 1;
+  padding: 40px 0 60px;
+}
+
+.cart-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--dark);
+  margin-bottom: 32px;
+}
+
+.cart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* Product Card */
+.cart-product-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  border: 1.5px solid var(--gray-200);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.product-image-wrap {
+  background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-img {
+  width: 200px;
+  height: auto;
+  border-radius: var(--radius-lg);
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.15));
+}
+
+.product-details {
+  padding: 24px;
+}
+
+.product-name {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+
+.product-desc {
+  font-size: 0.85rem;
+  color: var(--dark-400);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.product-pricing {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.product-price {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--dark);
+}
+
+.product-mrp {
+  font-size: 1rem;
+  color: var(--gray-400);
+  text-decoration: line-through;
+}
+
+.product-discount {
+  background: linear-gradient(135deg, var(--success), #34d058);
+  color: var(--white);
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.product-qty {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.qty-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--dark-400);
+}
+
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.qty-btn {
+  width: 36px;
+  height: 36px;
+  background: var(--gray-50);
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--dark);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.qty-btn:hover:not(:disabled) {
+  background: var(--gray-200);
+}
+
+.qty-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.qty-value {
+  width: 40px;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--dark);
+  border-left: 1.5px solid var(--gray-200);
+  border-right: 1.5px solid var(--gray-200);
+  line-height: 36px;
+}
+
+.product-cards-included {
+  margin-top: 4px;
+}
+
+.cards-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--dark-400);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.cards-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.card-chip {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+/* Order Form Card */
+.cart-form-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  border: 1.5px solid var(--gray-200);
+  box-shadow: var(--shadow-md);
+  padding: 28px;
+}
+
+.form-card-title {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--dark);
+  margin-bottom: 24px;
+}
+
+.cart-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-field label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--dark-400);
+  margin-bottom: 6px;
+}
+
+.form-field input,
+.form-field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  color: var(--dark);
+  background: var(--gray-50);
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  resize: vertical;
+}
+
+.form-field input:focus-visible,
+.form-field textarea:focus-visible {
+  border-color: var(--primary);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(232, 132, 44, 0.1);
+  outline: none;
+}
+
+/* Order Summary */
+.order-summary {
+  background: var(--gray-50);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  margin-top: 8px;
+  border: 1px solid var(--gray-200);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--dark-400);
+  padding: 6px 0;
+}
+
+.summary-row.savings span:last-child {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.summary-row .free-shipping {
+  color: var(--success);
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
+.summary-row.total {
+  border-top: 1.5px solid var(--gray-200);
+  margin-top: 8px;
+  padding-top: 12px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--dark);
+}
+
+.place-order-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(232, 132, 44, 0.35);
+  margin-top: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-title {
+    font-size: 1.5rem;
+  }
+
+  .product-image-wrap {
+    padding: 24px;
+  }
+
+  .product-img {
+    width: 160px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .cart-main {
+    padding: 24px 0 40px;
+  }
+
+  .cart-product-card,
+  .cart-form-card {
+    border-radius: var(--radius-lg);
+  }
+
+  .product-details {
+    padding: 18px;
+  }
+
+  .cart-form-card {
+    padding: 20px;
+  }
+}
+
+/* ======== FOCUS VISIBLE ======== */
+.cart-back-btn:focus-visible,
+.qty-btn:focus-visible,
+.place-order-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ======== REDUCED MOTION ======== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
