@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Device from './Device';
 import RFIDCard from './RFIDCard';
@@ -15,6 +15,17 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
   const [droppingCard, setDroppingCard] = useState(null);
   const deviceRef = useRef(null);
   const animatingRef = useRef(false);
+
+  // Derived now-playing data
+  const currentData = insertedCard ? cardContent[insertedCard] : null;
+  const currentItems = useMemo(() => {
+    if (!currentData) return [];
+    return currentData.items[userLang] || currentData.items['en'];
+  }, [currentData, userLang]);
+  const currentItem = currentItems[contentIndex] || null;
+
+  // Step bar: which step is active
+  const activeStep = !insertedCard ? 1 : (flyingCard || droppingCard) ? 2 : 3;
 
   useEffect(() => {
     return () => stopSpeech();
@@ -77,7 +88,7 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
     setTimeout(() => {
       setFlyingCard(null);
       onDone();
-    }, 1400);
+    }, 1800);
   }, []);
 
   // Drop card straight down into device (for drag)
@@ -95,7 +106,7 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
     setTimeout(() => {
       setDroppingCard(null);
       onDone();
-    }, 900);
+    }, 1100);
   }, []);
 
   const handleCardClick = useCallback((cardId, cardEl) => {
@@ -137,7 +148,6 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
     animatingRef.current = true;
     stopSpeech();
 
-    // Eject old card instantly (no delay — user already dragged the new one to device)
     if (insertedCard) {
       setInsertedCard(null);
       setContentIndex(0);
@@ -161,6 +171,31 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
     setTimeout(() => playContent(insertedCard, nextIndex), 400);
   }, [insertedCard, contentIndex, userLang, playContent]);
 
+  const handlePrevContent = useCallback(() => {
+    if (!insertedCard) return;
+    const data = cardContent[insertedCard];
+    const items = data.items[userLang] || data.items['en'];
+    const prevIndex = (contentIndex - 1 + items.length) % items.length;
+    stopSpeech();
+    setContentIndex(prevIndex);
+    setTimeout(() => playContent(insertedCard, prevIndex), 400);
+  }, [insertedCard, contentIndex, userLang, playContent]);
+
+  const handleTrackClick = useCallback((index) => {
+    if (!insertedCard) return;
+    if (index === contentIndex) return;
+    stopSpeech();
+    setContentIndex(index);
+    setTimeout(() => playContent(insertedCard, index), 400);
+  }, [insertedCard, contentIndex, playContent]);
+
+  const handleEject = useCallback(() => {
+    if (!insertedCard) return;
+    stopSpeech();
+    setInsertedCard(null);
+    setContentIndex(0);
+  }, [insertedCard]);
+
   const handleBack = useCallback(() => {
     stopSpeech();
     setInsertedCard(null);
@@ -170,18 +205,6 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
 
   return (
     <div className="demo-page">
-      {/* Decorative background elements */}
-      <div className="demo-bg-decor" aria-hidden="true">
-        <div className="decor-blob decor-blob-1" />
-        <div className="decor-blob decor-blob-2" />
-        <div className="decor-blob decor-blob-3" />
-        <div className="decor-float decor-float-1">🎵</div>
-        <div className="decor-float decor-float-2">📚</div>
-        <div className="decor-float decor-float-3">🔢</div>
-        <div className="decor-float decor-float-4">🐻</div>
-        <div className="decor-float decor-float-5">🎧</div>
-      </div>
-
       {/* Header */}
       <header className="demo-page-header">
         <div className="container demo-header-inner">
@@ -219,66 +242,92 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
         </div>
       </header>
 
-      {/* Main: Left shelves + Right device */}
+      {/* How It Works Step Bar */}
+      <div className="how-it-works-bar">
+        <div className="hiw-steps">
+          <div className={`hiw-step ${activeStep === 1 ? 'active' : ''} ${activeStep > 1 ? 'done' : ''}`}>
+            <span className="hiw-num">1</span>
+            <span className="hiw-label">Pick a Card</span>
+          </div>
+          <div className="hiw-connector">
+            <span className="hiw-dot" style={{ animationDelay: '0s' }} />
+            <span className="hiw-dot" style={{ animationDelay: '0.2s' }} />
+            <span className="hiw-dot" style={{ animationDelay: '0.4s' }} />
+          </div>
+          <div className={`hiw-step ${activeStep === 2 ? 'active' : ''} ${activeStep > 2 ? 'done' : ''}`}>
+            <span className="hiw-num">2</span>
+            <span className="hiw-label">Insert</span>
+          </div>
+          <div className="hiw-connector">
+            <span className="hiw-dot" style={{ animationDelay: '0.1s' }} />
+            <span className="hiw-dot" style={{ animationDelay: '0.3s' }} />
+            <span className="hiw-dot" style={{ animationDelay: '0.5s' }} />
+          </div>
+          <div className={`hiw-step ${activeStep === 3 ? 'active' : ''}`}>
+            <span className="hiw-num">3</span>
+            <span className="hiw-label">Listen</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main 3-Column Grid */}
       <main className="demo-main">
-        <div className="demo-split">
-          {/* LEFT: Bookshelf with 2 rows of 3 */}
-          <div className="demo-shelves-col">
-            <div className="bookshelf">
-              <div className="shelf-row">
-                <div className="shelf-books">
-                  {allCardIds.slice(0, 3).map((id, i) => (
-                    <motion.div
-                      key={id}
-                      className="book-slot"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.15 + i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    >
+        <div className="demo-grid">
+          {/* LEFT: Card Panel */}
+          <div className="card-panel">
+            <div className="card-panel-header">
+              <span className="card-panel-label">Your Cards</span>
+              <span className="card-panel-hint">Click or drag to device</span>
+            </div>
+            <div className="card-panel-grid">
+              {allCardIds.map((id, i) => {
+                const data = cardContent[id];
+                const items = data.items[userLang] || data.items['en'];
+                const isActive = insertedCard === id;
+                return (
+                  <motion.div
+                    key={id}
+                    className={`card-tile ${isActive ? 'card-tile-active' : ''}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <div className="card-tile-img">
                       <RFIDCard
                         cardId={id}
-                        isInserted={insertedCard === id}
+                        isInserted={isActive}
                         onCardClick={handleCardClick}
                         onDragToDevice={handleCardDrag}
                         deviceRef={deviceRef}
                       />
-                    </motion.div>
-                  ))}
-                </div>
-                <div className="shelf-plank" />
-              </div>
-              <div className="shelf-row">
-                <div className="shelf-books">
-                  {allCardIds.slice(3, 6).map((id, i) => (
-                    <motion.div
-                      key={id}
-                      className="book-slot"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.35 + i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      <RFIDCard
-                        cardId={id}
-                        isInserted={insertedCard === id}
-                        onCardClick={handleCardClick}
-                        onDragToDevice={handleCardDrag}
-                        deviceRef={deviceRef}
-                      />
-                    </motion.div>
-                  ))}
-                </div>
-                <div className="shelf-plank" />
-              </div>
+                      {isActive && <span className="card-tile-badge">Playing</span>}
+                    </div>
+                    <div className="card-tile-info">
+                      <span className="card-tile-icon">{data.icon}</span>
+                      <span className="card-tile-title">{data.title}</span>
+                      <span className="card-tile-count">{items.length} tracks</span>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
 
-          {/* RIGHT: Device (dominant) */}
-          <div className="demo-device-col">
+          {/* CENTER: Device Hero */}
+          <div className="device-hero">
+            {/* Animated rings behind device */}
+            <div className="device-ring device-ring-1" aria-hidden="true" />
+            <div className="device-ring device-ring-2" aria-hidden="true" />
+            <div className="device-ring device-ring-3" aria-hidden="true" />
+
+            {/* Spotlight glow */}
+            <div className="device-spotlight" aria-hidden="true" />
+
             <motion.div
               ref={deviceRef}
               className="demo-device-wrap"
-              initial={{ opacity: 0, scale: 0.9, x: 20 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
             >
               <Device
@@ -287,36 +336,127 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
                 isPlaying={isPlaying}
                 onKnobClick={handleKnobClick}
                 lang={userLang}
+                isReceiving={!!flyingCard || !!droppingCard}
               />
             </motion.div>
-          </div>
-        </div>
 
-        {/* Mobile: Card grid (hidden on desktop) */}
-        <div className="mobile-cards-area">
-          <h3 className="mobile-cards-title">Tap a card to insert</h3>
-          <div className="mobile-cards-grid">
-            {allCardIds.map((id, i) => {
-              const data = cardContent[id];
-              return (
-                <motion.button
-                  key={id}
-                  className={`mobile-card-item ${insertedCard === id ? 'inserted' : ''}`}
-                  style={{ background: data.bg }}
-                  onClick={() => handleCardClick(id, null)}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.06, duration: 0.4 }}
-                  whileHover={{ scale: 1.05, y: -4 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label={`Insert ${data.title} card`}
+            {/* Device pedestal / surface shadow */}
+            <div className="device-pedestal" aria-hidden="true" />
+          </div>
+
+          {/* RIGHT: Now Playing Panel */}
+          <div className="now-playing-panel">
+            <AnimatePresence mode="wait">
+              {!insertedCard ? (
+                <motion.div
+                  key="np-empty"
+                  className="np-empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <div className="mobile-card-chip" />
-                  <span className="mobile-card-icon">{data.icon}</span>
-                  <span className="mobile-card-label">{data.title}</span>
-                </motion.button>
-              );
-            })}
+                  <div className="np-empty-visual">
+                    <div className="np-empty-card-anim">
+                      <div className="np-empty-card-ghost" />
+                      <div className="np-empty-card-ghost np-ghost-2" />
+                      <div className="np-empty-card-ghost np-ghost-3" />
+                    </div>
+                    <div className="np-empty-device-icon">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="4" y="2" width="16" height="20" rx="3"/>
+                        <line x1="8" y1="6" x2="16" y2="6"/>
+                        <circle cx="12" cy="14" r="3"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="np-empty-title">Waiting for a card...</p>
+                  <p className="np-empty-desc">Pick a card and click or drag it to the Cheeko device to hear it come alive!</p>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="np-active"
+                  className="np-active"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {/* Card header */}
+                  <div className="np-header">
+                    <span className="np-header-icon" style={{ background: currentData.bg }}>{currentData.icon}</span>
+                    <div className="np-header-info">
+                      <span className="np-header-title">{currentData.title}</span>
+                      <span className="np-header-count">{currentItems.length} tracks</span>
+                    </div>
+                    <button className="np-eject-btn" onClick={handleEject} title="Eject card" aria-label="Eject card">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                    </button>
+                  </div>
+
+                  {/* Waveform equalizer */}
+                  <div className={`np-waveform ${isPlaying ? 'np-waveform-playing' : ''}`}>
+                    {Array.from({ length: 12 }).map((_, i) => (
+                      <span
+                        key={i}
+                        className="np-bar"
+                        style={{ animationDelay: `${i * 0.08}s`, height: `${20 + Math.random() * 60}%` }}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Current content display */}
+                  <div className="np-current">
+                    <span className="np-current-label">NOW PLAYING</span>
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={`${insertedCard}-${contentIndex}`}
+                        className="np-current-content"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.25 }}
+                      >
+                        <div className="np-current-title">{currentItem?.title}</div>
+                        <div className="np-current-text">{currentItem?.text}</div>
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Playback controls */}
+                  <div className="np-controls">
+                    <button className="np-ctrl-btn" onClick={handlePrevContent} aria-label="Previous track">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                    </button>
+                    <button className="np-ctrl-btn np-ctrl-play" onClick={handleKnobClick} aria-label="Play next">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
+                    </button>
+                    <button className="np-ctrl-btn" onClick={handleKnobClick} aria-label="Next track">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                    </button>
+                  </div>
+
+                  {/* Track list */}
+                  <div className="np-tracklist">
+                    {currentItems.map((item, i) => (
+                      <button
+                        key={i}
+                        className={`np-track ${i === contentIndex ? 'np-track-active' : ''}`}
+                        onClick={() => handleTrackClick(i)}
+                      >
+                        <span className="np-track-num">{i + 1}</span>
+                        <span className="np-track-title">{item.title}</span>
+                        {i === contentIndex && isPlaying && (
+                          <span className="np-track-eq" aria-label="Playing">
+                            <span /><span /><span />
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </main>
@@ -347,9 +487,15 @@ function FlyingCardArc({ flying }) {
   const { cardId, startX, startY, endX, endY, width, height } = flying;
   const data = cardContent[cardId];
 
-  // Arc peak: midpoint X, well above both start and end Y
-  const peakY = Math.min(startY, endY) - 180;
+  // High dramatic arc
+  const peakY = Math.min(startY, endY) - 210;
   const midX = (startX + endX) / 2;
+
+  // Smooth 5-point arc control points
+  const q1X = startX + (midX - startX) * 0.55;
+  const q1Y = startY + (peakY - startY) * 0.7;
+  const q3X = midX + (endX - midX) * 0.55;
+  const q3Y = peakY + (endY - peakY) * 0.35;
 
   return (
     <motion.div
@@ -362,18 +508,36 @@ function FlyingCardArc({ flying }) {
         opacity: 1,
       }}
       animate={{
-        left: [startX - width / 2, midX - width / 2, endX - width / 2],
-        top: [startY - height / 2, peakY - height / 2, endY - height / 2],
-        scale: [1, 0.88, 0.5],
-        opacity: [1, 1, 0.8],
-        rotate: [0, -6, 0],
+        left: [
+          startX - width / 2,     // K1: start
+          q1X - width / 2,        // K2: rising
+          midX - width / 2,       // K3: arc peak
+          q3X - width / 2,        // K4: descending
+          endX - width / 2,       // K5: above slot
+          endX - width / 2,       // K6: entering slot
+          endX - width / 2,       // K7: inside slot
+        ],
+        top: [
+          startY - height / 2,    // K1: start
+          q1Y - height / 2,       // K2: rising
+          peakY - height / 2,     // K3: arc peak
+          q3Y - height / 2,       // K4: descending
+          endY - height / 2,      // K5: above slot
+          endY + 20,              // K6: entering slot
+          endY + 55,              // K7: inside slot
+        ],
+        scale: [1, 1.08, 0.86, 0.62, 0.48, 0.38, 0.18],
+        scaleX: [1, 1.02, 1, 0.85, 0.62, 0.48, 0.3],
+        opacity: [1, 1, 1, 1, 0.9, 0.5, 0],
+        rotate: [0, -15, -5, 5, 1, 0, 0],
       }}
-      exit={{ opacity: 0, scale: 0.3 }}
+      exit={{ opacity: 0, scale: 0.05 }}
       transition={{
-        duration: 1.2,
+        duration: 1.7,
+        times: [0, 0.14, 0.33, 0.52, 0.68, 0.84, 1],
         ease: [0.22, 1, 0.36, 1],
-        left: { duration: 1.2, ease: 'easeInOut' },
-        top: { duration: 1.2, ease: [0.32, 0, 0.67, 1] },
+        left: { ease: 'easeInOut' },
+        top: { ease: [0.25, 0.1, 0.25, 1] },
       }}
     >
       {data.cardImage ? (
@@ -400,16 +564,27 @@ function DroppingCard({ dropping }) {
         top: startY - height / 2,
         scale: 0.9,
         opacity: 1,
+        rotate: -3,
       }}
       animate={{
-        top: endY - height / 2,
-        scale: 0.5,
-        opacity: [1, 1, 0],
+        top: [
+          startY - height / 2,      // start: above device
+          startY - height / 2 - 14,  // slight lift (hover)
+          endY - height / 2,         // at slot opening
+          endY + 22,                  // entering slot
+          endY + 50,                  // inside slot
+        ],
+        scale: [0.9, 0.88, 0.52, 0.38, 0.15],
+        scaleX: [1, 1, 0.68, 0.5, 0.3],
+        opacity: [1, 1, 0.95, 0.5, 0],
+        rotate: [-3, 0, 0, 0, 0],
       }}
-      exit={{ opacity: 0, scale: 0.3 }}
+      exit={{ opacity: 0, scale: 0.05 }}
       transition={{
-        duration: 0.8,
+        duration: 1.0,
+        times: [0, 0.1, 0.45, 0.72, 1],
         ease: [0.22, 1, 0.36, 1],
+        top: { ease: [0.45, 0.05, 0.55, 1] },
       }}
     >
       {data.cardImage ? (

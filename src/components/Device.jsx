@@ -3,7 +3,7 @@ import cardContent from '../data/cardContent';
 
 const PARTICLE_COLORS = ['#FFD503', '#E8423F', '#FF8C42', '#7C5CFC', '#00C9A7', '#FF6B8A'];
 
-export default function Device({ insertedCard, contentIndex, isPlaying, onKnobClick, lang }) {
+export default function Device({ insertedCard, contentIndex, isPlaying, onKnobClick, lang, isReceiving }) {
   const [ledsActive, setLedsActive] = useState(false);
   const [screenOn, setScreenOn] = useState(false);
   const [changing, setChanging] = useState(false);
@@ -26,8 +26,9 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
         setScreenOn(true);
         spawnParticles();
       }, 800);
+      const t3 = setTimeout(() => setCardAnim(''), 1200);
       prevCardRef.current = insertedCard;
-      return () => { clearTimeout(t1); clearTimeout(t2); };
+      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
     }
     if (!insertedCard && prevCardRef.current) {
       setCardAnim('ejecting');
@@ -36,7 +37,7 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
       const t = setTimeout(() => {
         setCardAnim('');
         prevCardRef.current = null;
-      }, 800);
+      }, 900);
       return () => clearTimeout(t);
     }
   }, [insertedCard]);
@@ -56,23 +57,22 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
   }, [insertedCard, onKnobClick]);
 
   const spawnParticles = () => {
-    const newParticles = Array.from({ length: 15 }, () => {
-      const tx = (Math.random() - 0.5) * 150;
-      const ty = (Math.random() - 0.5) * 100 - 30;
+    const newParticles = Array.from({ length: 22 }, () => {
+      const tx = (Math.random() - 0.5) * 200;
+      const ty = (Math.random() - 0.5) * 130 - 40;
+      const size = 3 + Math.random() * 6;
       return {
         id: particleIdRef.current++,
         color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
-        tx, ty,
+        tx, ty, size,
       };
     });
     setParticles(newParticles);
-    setTimeout(() => setParticles([]), 800);
+    setTimeout(() => setParticles([]), 1000);
   };
 
   return (
     <div className="device-container" ref={containerRef}>
-      {/* Card insertion handled by flying arc animation in DemoPage */}
-
       {/* Particles */}
       {particles.map((p) => (
         <div
@@ -82,6 +82,8 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
             background: p.color,
             left: '50%',
             top: '30px',
+            width: p.size + 'px',
+            height: p.size + 'px',
             '--tx': p.tx + 'px',
             '--ty': p.ty + 'px',
           }}
@@ -91,7 +93,13 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
       {/* 3D Device */}
       <div className="device-3d-wrapper">
         {/* Main device body */}
-        <div className={`device ${isPlaying ? 'playing' : ''}`}>
+        <div className={`device ${isPlaying ? 'playing' : ''} ${cardAnim === 'animating' ? 'receiving' : ''}`}>
+
+          {/* Slot glow — pulses while card approaches or inserts */}
+          {(isReceiving || cardAnim === 'animating') && (
+            <div className="slot-glow" />
+          )}
+
           {/* Card peeking out of slot */}
           {insertedCard && data && (
             <div className="peeking-card">

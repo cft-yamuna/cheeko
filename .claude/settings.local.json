@@ -7,7 +7,10 @@
       "Bash(npx --yes sharp-cli:*)",
       "Bash(npx sharp-cli:*)",
       "Bash(npm install:*)",
-      "Bash(npx vite build)"
+      "Bash(npx vite build)",
+      "mcp__ide__getDiagnostics",
+      "Bash(timeout 8 npm run dev:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }
