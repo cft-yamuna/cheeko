@@ -21,14 +21,13 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
   useEffect(() => {
     if (insertedCard && insertedCard !== prevCardRef.current) {
       setCardAnim('animating');
-      const t1 = setTimeout(() => setLedsActive(true), 300);
-      const t2 = setTimeout(() => {
-        setScreenOn(true);
-        spawnParticles();
-      }, 800);
-      const t3 = setTimeout(() => setCardAnim(''), 1200);
+      // Staggered reveal: LEDs → screen on → particles → done
+      const t1 = setTimeout(() => setLedsActive(true), 350);
+      const t2 = setTimeout(() => setScreenOn(true), 800);
+      const t3 = setTimeout(() => spawnParticles(), 950);
+      const t4 = setTimeout(() => setCardAnim(''), 1200);
       prevCardRef.current = insertedCard;
-      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
     }
     if (!insertedCard && prevCardRef.current) {
       setCardAnim('ejecting');
@@ -37,7 +36,7 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
       const t = setTimeout(() => {
         setCardAnim('');
         prevCardRef.current = null;
-      }, 900);
+      }, 1000);
       return () => clearTimeout(t);
     }
   }, [insertedCard]);

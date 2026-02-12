@@ -88,25 +88,32 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
     setTimeout(() => {
       setFlyingCard(null);
       onDone();
-    }, 1800);
+    }, 2100);
   }, []);
 
-  // Drop card straight down into device (for drag)
-  const dropCardIntoDevice = useCallback((cardId, onDone) => {
+  // Drop card into device (for drag) — starts from actual drop position
+  const dropCardIntoDevice = useCallback((cardId, dropPoint, onDone) => {
     if (!deviceRef.current) { onDone(); return; }
     const deviceRect = deviceRef.current.getBoundingClientRect();
-    const endX = deviceRect.left + deviceRect.width / 2;
-    const startY = deviceRect.top - 120;
-    const endY = deviceRect.top - 10;
+    const slotX = deviceRect.left + deviceRect.width / 2;
+    const slotY = deviceRect.top - 10;
     const flyW = 80;
     const flyH = 110;
 
-    setDroppingCard({ cardId, x: endX, startY, endY, width: flyW, height: flyH });
+    setDroppingCard({
+      cardId,
+      startX: dropPoint?.x || slotX,
+      startY: dropPoint?.y || (slotY - 120),
+      slotX,
+      slotY,
+      width: flyW,
+      height: flyH,
+    });
 
     setTimeout(() => {
       setDroppingCard(null);
       onDone();
-    }, 1100);
+    }, 1600);
   }, []);
 
   const handleCardClick = useCallback((cardId, cardEl) => {
@@ -127,7 +134,7 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
       launchFlyingCard(cardId, cardEl, () => {
         setInsertedCard(cardId);
         setContentIndex(0);
-        setTimeout(() => playContent(cardId, 0), 400);
+        setTimeout(() => playContent(cardId, 0), 800);
         animatingRef.current = false;
       });
     };
@@ -141,7 +148,7 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
     }
   }, [insertedCard, playContent, launchFlyingCard]);
 
-  const handleCardDrag = useCallback((cardId) => {
+  const handleCardDrag = useCallback((cardId, dropPoint) => {
     if (animatingRef.current) return;
     if (insertedCard === cardId) return;
 
@@ -153,10 +160,10 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
       setContentIndex(0);
     }
 
-    dropCardIntoDevice(cardId, () => {
+    dropCardIntoDevice(cardId, dropPoint, () => {
       setInsertedCard(cardId);
       setContentIndex(0);
-      setTimeout(() => playContent(cardId, 0), 400);
+      setTimeout(() => playContent(cardId, 0), 800);
       animatingRef.current = false;
     });
   }, [insertedCard, playContent, dropCardIntoDevice]);
@@ -323,9 +330,33 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
             {/* Spotlight glow */}
             <div className="device-spotlight" aria-hidden="true" />
 
+            {/* Slot hint — only when no card inserted */}
+            {!insertedCard && (
+              <div className="device-slot-hint">
+                <svg className="hint-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+                <span>Insert a card</span>
+              </div>
+            )}
+
+            {/* Floating sparkles around device */}
+            {!insertedCard && (
+              <div className="device-sparkles" aria-hidden="true">
+                <span className="sparkle s1" />
+                <span className="sparkle s2" />
+                <span className="sparkle s3" />
+                <span className="sparkle s4" />
+                <span className="sparkle s5" />
+                <span className="sparkle s6" />
+                <span className="sparkle s7" />
+                <span className="sparkle s8" />
+              </div>
+            )}
+
             <motion.div
               ref={deviceRef}
-              className="demo-device-wrap"
+              className={`demo-device-wrap ${!insertedCard ? 'device-idle' : ''}`}
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
@@ -342,45 +373,53 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
 
             {/* Device pedestal / surface shadow */}
             <div className="device-pedestal" aria-hidden="true" />
+
+            {/* Tagline below device */}
+            {!insertedCard && (
+              <p className="device-tagline">Tap a card to bring it to life</p>
+            )}
           </div>
 
-          {/* RIGHT: Now Playing Panel */}
+          {/* RIGHT: Now Playing Panel — always visible */}
           <div className="now-playing-panel">
+            {/* Decorative blobs */}
+            <div className="np-blob np-blob-1" aria-hidden="true" />
+            <div className="np-blob np-blob-2" aria-hidden="true" />
+
             <AnimatePresence mode="wait">
               {!insertedCard ? (
                 <motion.div
-                  key="np-empty"
-                  className="np-empty"
+                  key="np-idle"
+                  className="np-idle"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="np-empty-visual">
-                    <div className="np-empty-card-anim">
-                      <div className="np-empty-card-ghost" />
-                      <div className="np-empty-card-ghost np-ghost-2" />
-                      <div className="np-empty-card-ghost np-ghost-3" />
-                    </div>
-                    <div className="np-empty-device-icon">
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="4" y="2" width="16" height="20" rx="3"/>
-                        <line x1="8" y1="6" x2="16" y2="6"/>
-                        <circle cx="12" cy="14" r="3"/>
-                      </svg>
-                    </div>
+                  {/* Fun floating music notes */}
+                  <div className="np-idle-notes" aria-hidden="true">
+                    <span className="np-note n1">&#9835;</span>
+                    <span className="np-note n2">&#9834;</span>
+                    <span className="np-note n3">&#9833;</span>
                   </div>
-                  <p className="np-empty-title">Waiting for a card...</p>
-                  <p className="np-empty-desc">Pick a card and click or drag it to the Cheeko device to hear it come alive!</p>
+
+                  <div className="np-idle-icon" aria-hidden="true">
+                    <span className="np-idle-emoji">&#127911;</span>
+                  </div>
+                  <p className="np-idle-title">Ready to Play!</p>
+                  <p className="np-idle-desc">Pick a card and tap it to hear the magic</p>
+                  <div className="np-idle-bars" aria-hidden="true">
+                    <span /><span /><span /><span /><span /><span /><span />
+                  </div>
                 </motion.div>
               ) : (
                 <motion.div
                   key="np-active"
                   className="np-active"
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                 >
                   {/* Card header */}
                   <div className="np-header">
@@ -405,9 +444,9 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
                     ))}
                   </div>
 
-                  {/* Current content display */}
+                  {/* Now playing label */}
                   <div className="np-current">
-                    <span className="np-current-label">NOW PLAYING</span>
+                    <span className="np-current-label">&#127925; NOW PLAYING</span>
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={`${insertedCard}-${contentIndex}`}
@@ -487,57 +526,37 @@ function FlyingCardArc({ flying }) {
   const { cardId, startX, startY, endX, endY, width, height } = flying;
   const data = cardContent[cardId];
 
-  // High dramatic arc
-  const peakY = Math.min(startY, endY) - 210;
-  const midX = (startX + endX) / 2;
-
-  // Smooth 5-point arc control points
-  const q1X = startX + (midX - startX) * 0.55;
-  const q1Y = startY + (peakY - startY) * 0.7;
-  const q3X = midX + (endX - midX) * 0.55;
-  const q3Y = peakY + (endY - peakY) * 0.35;
+  // Gentle arc: only lift ~80px above the straight path
+  const dx = endX - startX;
+  const dy = endY - startY;
+  const arcLift = -80;
 
   return (
     <motion.div
       className="flying-card-arc"
-      style={{ width, height }}
-      initial={{
+      style={{
+        width,
+        height,
         left: startX - width / 2,
         top: startY - height / 2,
-        scale: 1,
-        opacity: 1,
       }}
+      initial={{ x: 0, y: 0, scale: 1, opacity: 1 }}
       animate={{
-        left: [
-          startX - width / 2,     // K1: start
-          q1X - width / 2,        // K2: rising
-          midX - width / 2,       // K3: arc peak
-          q3X - width / 2,        // K4: descending
-          endX - width / 2,       // K5: above slot
-          endX - width / 2,       // K6: entering slot
-          endX - width / 2,       // K7: inside slot
-        ],
-        top: [
-          startY - height / 2,    // K1: start
-          q1Y - height / 2,       // K2: rising
-          peakY - height / 2,     // K3: arc peak
-          q3Y - height / 2,       // K4: descending
-          endY - height / 2,      // K5: above slot
-          endY + 20,              // K6: entering slot
-          endY + 55,              // K7: inside slot
-        ],
-        scale: [1, 1.08, 0.86, 0.62, 0.48, 0.38, 0.18],
-        scaleX: [1, 1.02, 1, 0.85, 0.62, 0.48, 0.3],
-        opacity: [1, 1, 1, 1, 0.9, 0.5, 0],
-        rotate: [0, -15, -5, 5, 1, 0, 0],
+        // Phase 1: gentle float to above slot
+        // Phase 2: brief hover
+        // Phase 3: slide into slot
+        x: [0, dx * 0.5, dx, dx, dx],
+        y: [0, dy * 0.4 + arcLift, dy, dy + 30, dy + 55],
+        scale: [1, 0.72, 0.55, 0.4, 0.2],
+        scaleX: [1, 0.8, 0.65, 0.45, 0.25],
+        opacity: [1, 1, 1, 0.6, 0],
       }}
-      exit={{ opacity: 0, scale: 0.05 }}
+      exit={{ opacity: 0 }}
       transition={{
-        duration: 1.7,
-        times: [0, 0.14, 0.33, 0.52, 0.68, 0.84, 1],
-        ease: [0.22, 1, 0.36, 1],
-        left: { ease: 'easeInOut' },
-        top: { ease: [0.25, 0.1, 0.25, 1] },
+        duration: 2.0,
+        // 0→55%: float to slot | 55→70%: hover | 70→100%: slide in
+        times: [0, 0.55, 0.7, 0.88, 1],
+        ease: 'easeInOut',
       }}
     >
       {data.cardImage ? (
@@ -552,39 +571,35 @@ function FlyingCardArc({ flying }) {
 }
 
 function DroppingCard({ dropping }) {
-  const { cardId, x, startY, endY, width, height } = dropping;
+  const { cardId, startX, startY, slotX, slotY, width, height } = dropping;
   const data = cardContent[cardId];
+
+  const dx = slotX - startX;
+  const dy = slotY - startY;
 
   return (
     <motion.div
       className="flying-card-arc"
-      style={{ width, height }}
-      initial={{
-        left: x - width / 2,
+      style={{
+        width,
+        height,
+        left: startX - width / 2,
         top: startY - height / 2,
-        scale: 0.9,
-        opacity: 1,
-        rotate: -3,
       }}
+      initial={{ x: 0, y: 0, scale: 0.8, opacity: 1 }}
       animate={{
-        top: [
-          startY - height / 2,      // start: above device
-          startY - height / 2 - 14,  // slight lift (hover)
-          endY - height / 2,         // at slot opening
-          endY + 22,                  // entering slot
-          endY + 50,                  // inside slot
-        ],
-        scale: [0.9, 0.88, 0.52, 0.38, 0.15],
-        scaleX: [1, 1, 0.68, 0.5, 0.3],
-        opacity: [1, 1, 0.95, 0.5, 0],
-        rotate: [-3, 0, 0, 0, 0],
+        // Float to slot, hover, slide in
+        x: [0, dx * 0.6, dx, dx, dx],
+        y: [0, dy * 0.5, dy, dy + 30, dy + 55],
+        scale: [0.8, 0.6, 0.5, 0.38, 0.18],
+        scaleX: [1, 0.8, 0.65, 0.45, 0.25],
+        opacity: [1, 1, 1, 0.6, 0],
       }}
-      exit={{ opacity: 0, scale: 0.05 }}
+      exit={{ opacity: 0 }}
       transition={{
-        duration: 1.0,
-        times: [0, 0.1, 0.45, 0.72, 1],
-        ease: [0.22, 1, 0.36, 1],
-        top: { ease: [0.45, 0.05, 0.55, 1] },
+        duration: 1.5,
+        times: [0, 0.45, 0.65, 0.85, 1],
+        ease: 'easeInOut',
       }}
     >
       {data.cardImage ? (

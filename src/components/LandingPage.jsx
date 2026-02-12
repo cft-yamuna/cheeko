@@ -1,26 +1,12 @@
 import { useState, useEffect } from 'react';
-import { motion, useMotionValue, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import '../styles/LandingPage.css';
-
-const cardPreviews = [
-  { icon: '🎵', label: 'Rhymes', color: '#FF6B8A' },
-  { icon: '📚', label: 'Stories', color: '#7C5CFC' },
-  { icon: '🅰️', label: 'ABC', color: '#00C9A7' },
-  { icon: '🔢', label: 'Numbers', color: '#FFB830' },
-  { icon: '🐻', label: 'Animals', color: '#2DC653' },
-  { icon: '🎧', label: 'Music', color: '#FF8C42' },
-];
 
 export default function LandingPage({ onStartDemo, onCart }) {
   const [demoName, setDemoName] = useState('');
   const [demoLang, setDemoLang] = useState('en');
   const [formVisible, setFormVisible] = useState(false);
-
-  // Device tilt on mouse move
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const rotateX = useSpring(useTransform(mouseY, [-300, 300], [6, -6]), { stiffness: 120, damping: 25 });
-  const rotateY = useSpring(useTransform(mouseX, [-300, 300], [-6, 6]), { stiffness: 120, damping: 25 });
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -41,17 +27,6 @@ export default function LandingPage({ onStartDemo, onCart }) {
     return () => window.removeEventListener('keydown', handleKey);
   }, [formVisible]);
 
-  const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    mouseX.set(e.clientX - rect.left - rect.width / 2);
-    mouseY.set(e.clientY - rect.top - rect.height / 2);
-  };
-
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-  };
-
   const showForm = () => setFormVisible(true);
 
   const handleDemoSubmit = (e) => {
@@ -62,23 +37,21 @@ export default function LandingPage({ onStartDemo, onCart }) {
 
   return (
     <div className="landing">
-      {/* Nav */}
+      {/* ===== YELLOW NAV BAR ===== */}
       <nav className="landing-nav">
         <div className="nav-inner">
           <div className="nav-brand">
-            <span className="brand-name">CHEEKO</span>
-            <span className="brand-dot">&#10038;</span>
+            <span className="brand-name">Cheeko</span>
           </div>
+
+          <div className="nav-links">
+            <a href="#" className="nav-link active">Home</a>
+            <a href="#" className="nav-link">Our Story</a>
+            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); onCart(); }}>Shop</a>
+            <a href="#" className="nav-link">Contact</a>
+          </div>
+
           <div className="nav-actions">
-            <motion.button
-              className="nav-cart-btn"
-              onClick={onCart}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-              Buy Now
-            </motion.button>
             <motion.button
               className="nav-demo-btn"
               onClick={showForm}
@@ -88,166 +61,103 @@ export default function LandingPage({ onStartDemo, onCart }) {
               Try Demo
             </motion.button>
           </div>
+
+          {/* Mobile hamburger */}
+          <button
+            className="nav-hamburger"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`} />
+            <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`} />
+            <span className={`hamburger-line ${mobileMenuOpen ? 'open' : ''}`} />
+          </button>
         </div>
+
+        {/* Mobile menu dropdown */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              className="mobile-menu"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <a href="#" className="mobile-link" onClick={() => setMobileMenuOpen(false)}>Home</a>
+              <a href="#" className="mobile-link" onClick={() => setMobileMenuOpen(false)}>Our Story</a>
+              <a href="#" className="mobile-link" onClick={(e) => { e.preventDefault(); onCart(); setMobileMenuOpen(false); }}>Shop</a>
+              <a href="#" className="mobile-link" onClick={() => setMobileMenuOpen(false)}>Contact</a>
+              <button className="mobile-demo-btn" onClick={() => { showForm(); setMobileMenuOpen(false); }}>
+                Try Demo
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
-      {/* Hero */}
+      {/* ===== HERO SECTION ===== */}
       <section className="hero">
-        {/* Ambient glows */}
-        <div className="hero-glow" />
-        <div className="hero-glow-secondary" />
+        {/* Blue S-curve background shape */}
+        <svg className="hero-bg-shape" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true">
+          <path
+            d="M0,0 H1440 V310
+               C1340,370 1180,440 1000,480
+               C820,520 640,570 480,640
+               C320,710 160,790 0,830
+               V0 Z"
+            fill="#1B2A5E"
+          />
+        </svg>
 
-        <div className="hero-content">
-          {/* Left - Text */}
+        <div className="hero-inner">
+          {/* Left text on blue area */}
           <motion.div
             className="hero-text"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           >
-            <motion.div
-              className="hero-tag"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-            >
-              <span className="tag-dot" />
-              AI-Powered Learning Device
-            </motion.div>
-
             <h1 className="hero-title">
-              Insert a card.
-              <br />
-              <span className="title-accent">Watch the magic.</span>
+              <span className="title-yellow">Your Child's All-in-One</span>
+              {' '}Learning Companion.
             </h1>
 
             <p className="hero-subtitle">
-              Cheeko plays stories, rhymes & lessons on its built-in screen.
-              Just pick a card, slide it in, and your child starts learning.
+              From Songs & Stories to Math, Future
+              Skills, & More! Unlock a world of
+              knowledge with a simple card!
             </p>
 
-            {/* Card preview chips */}
-            <motion.div
-              className="card-preview-row"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.7 }}
+            <motion.button
+              className="cta-primary"
+              onClick={showForm}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.97 }}
             >
-              {cardPreviews.map((card, i) => (
-                <motion.div
-                  key={card.label}
-                  className="card-preview-chip"
-                  style={{ '--chip-color': card.color }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.6 + i * 0.08, duration: 0.4 }}
-                  whileHover={{ scale: 1.1, y: -3 }}
-                >
-                  <span>{card.icon}</span>
-                  <small>{card.label}</small>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            <motion.div
-              className="hero-ctas"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.6 }}
-            >
-              <motion.button
-                className="cta-primary"
-                onClick={showForm}
-                whileHover={{ scale: 1.04, y: -2 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                Try Interactive Demo
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </motion.button>
-              <div className="hero-price-tag">
-                {/* <span className="price-badge">SOLD OUT</span> */}
-                <span className="price-amount">&#8377;3,999</span>
-                <span className="price-old">&#8377;7,999</span>
-              </div>
-            </motion.div>
+              Try Demo
+            </motion.button>
           </motion.div>
 
-          {/* Right - Device */}
+          {/* Right illustration */}
           <motion.div
-            className="hero-device-wrap"
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            initial={{ opacity: 0, scale: 0.85 }}
+            className="hero-illustration"
+            initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
-            <motion.div
-              className="device-perspective"
-              style={{ rotateX, rotateY }}
-            >
-              <div className="device-glow-ring" />
-
-              <img
-                src="/1.jpeg"
-                alt="Cheeko AI Device"
-                className="device-image"
-                draggable={false}
-                width="360"
-                height="480"
-                fetchPriority="high"
-              />
-
-              {/* Floating cards */}
-              <motion.div
-                className="floating-card fc-top"
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <div className="fc-inner" style={{ background: 'linear-gradient(135deg, #FF6B8A, #FF8FA3)' }}>
-                  <span>🎵</span>
-                  <small>Rhymes</small>
-                </div>
-              </motion.div>
-
-              <motion.div
-                className="floating-card fc-bottom"
-                animate={{ y: [0, 8, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-              >
-                <div className="fc-inner" style={{ background: 'linear-gradient(135deg, #7C5CFC, #9B8AFF)' }}>
-                  <span>📚</span>
-                  <small>Stories</small>
-                </div>
-              </motion.div>
-            </motion.div>
+            <img
+              src="/hero-image.jpeg"
+              alt="Child learning with Cheeko - Songs, Stories, Math, Future Skills, and Robot activities"
+              className="hero-img"
+              draggable={false}
+              fetchPriority="high"
+            />
           </motion.div>
         </div>
-
-        {/* Scroll hint */}
-        <AnimatePresence>
-          {!formVisible && (
-            <motion.button
-              className="scroll-hint"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ delay: 1.5 }}
-              onClick={showForm}
-            >
-              <span>Try the demo</span>
-              <motion.svg
-                width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                animate={{ y: [0, 6, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-              >
-                <path d="M12 5v14M5 12l7 7 7-7"/>
-              </motion.svg>
-            </motion.button>
-          )}
-        </AnimatePresence>
       </section>
 
-      {/* Demo Form - Modal Popup */}
+      {/* ===== DEMO FORM MODAL ===== */}
       <AnimatePresence>
         {formVisible && (
           <motion.div
@@ -308,7 +218,6 @@ export default function LandingPage({ onStartDemo, onCart }) {
 
                 {/* RIGHT — Form panel */}
                 <div className="modal-right">
-                  {/* Decorative corner shapes */}
                   <div className="mr-decor" aria-hidden="true">
                     <span className="mr-dot mr-dot-1" />
                     <span className="mr-dot mr-dot-2" />
@@ -321,12 +230,6 @@ export default function LandingPage({ onStartDemo, onCart }) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2, duration: 0.45 }}
                   >
-                    <div className="mr-badge-row">
-                      <span className="mr-badge">
-                        <span className="mr-badge-dot" />
-                        Live Demo
-                      </span>
-                    </div>
                     <h2 className="form-title">
                       {demoName.trim() ? (
                         <>Hey <span className="title-name">{demoName.trim()}</span>, let's play!</>
@@ -362,18 +265,6 @@ export default function LandingPage({ onStartDemo, onCart }) {
                           autoComplete="off"
                           autoFocus
                         />
-                        <AnimatePresence>
-                          {demoName.trim() && (
-                            <motion.span
-                              className="input-check"
-                              initial={{ scale: 0 }}
-                              animate={{ scale: 1 }}
-                              exit={{ scale: 0 }}
-                            >
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-                            </motion.span>
-                          )}
-                        </AnimatePresence>
                       </div>
                     </motion.div>
 
@@ -438,9 +329,7 @@ export default function LandingPage({ onStartDemo, onCart }) {
                         whileHover={{ scale: 1.03, y: -2 }}
                         whileTap={{ scale: 0.97 }}
                       >
-                        <span className="submit-cta-text">
-                          Launch Demo
-                        </span>
+                        <span className="submit-cta-text">Launch Demo</span>
                         <span className="submit-cta-arrow">
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                         </span>

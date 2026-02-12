@@ -7,28 +7,38 @@ export default function RFIDCard({ cardId, isInserted, onCardClick, onDragToDevi
   const cardRef = useRef(null);
   const didDragRef = useRef(false);
 
-  const handleDragStart = () => {
-    didDragRef.current = true;
+  const dragStartPos = useRef({ x: 0, y: 0 });
+
+  const handleDragStart = (e, info) => {
+    dragStartPos.current = { x: info.point.x, y: info.point.y };
   };
 
   const handleDragEnd = (e, info) => {
+    // Check if this was a real drag (moved > 10px) vs an accidental micro-drag
+    const dx = info.point.x - dragStartPos.current.x;
+    const dy = info.point.y - dragStartPos.current.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance > 10) {
+      didDragRef.current = true;
+    }
+
     if (!deviceRef?.current) return;
     const deviceRect = deviceRef.current.getBoundingClientRect();
 
-    // Use info.point (pointer position at release) for hit detection
     const pointerX = info.point.x;
     const pointerY = info.point.y;
 
     const inX = pointerX >= deviceRect.left - 80 && pointerX <= deviceRect.right + 80;
     const inY = pointerY >= deviceRect.top - 80 && pointerY <= deviceRect.bottom + 80;
 
-    if (inX && inY) {
-      onDragToDevice(cardId);
+    if (inX && inY && distance > 10) {
+      // Pass the release point so the drop animation starts from where the user let go
+      onDragToDevice(cardId, { x: pointerX, y: pointerY });
     }
   };
 
   const handleClick = () => {
-    // Skip click if a drag just happened
     if (didDragRef.current) {
       didDragRef.current = false;
       return;
