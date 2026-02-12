@@ -57,7 +57,7 @@ export default function RFIDCard({ cardId, isInserted, onCardClick, onDragToDevi
     >
       <div className="rfid-card-visual">
         {data.cardImage ? (
-          <img src={data.cardImage} alt={data.title} className="rfid-card-img" draggable={false} />
+          <img src={data.cardImage} alt={data.title} className="rfid-card-img" draggable={false} loading="lazy" decoding="async" />
         ) : (
           <div className="rfid-card-gradient" style={{ background: data.bg }}>
             <span className="rfid-card-icon">{data.icon}</span>

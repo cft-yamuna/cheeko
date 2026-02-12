@@ -1,31 +1,25 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { RoundedBox, Float, Environment, ContactShadows } from '@react-three/drei';
-import * as THREE from 'three';
+import { RoundedBox, Float } from '@react-three/drei';
 
 /* ======== 3D CHEEKO DEVICE ======== */
 function CheekDevice({ isHovered }) {
   const groupRef = useRef();
   const knobRef = useRef();
   const cardRef = useRef();
-  const [knobAngle, setKnobAngle] = useState(0);
 
-  // Gentle idle rotation
+  // Gentle idle rotation — no setState, pure ref mutations for zero re-renders
   useFrame((state) => {
+    const t = state.clock.elapsedTime;
     if (groupRef.current) {
-      const t = state.clock.elapsedTime;
       groupRef.current.rotation.y = Math.sin(t * 0.3) * 0.15 + (isHovered ? 0.3 : 0);
       groupRef.current.rotation.x = Math.sin(t * 0.2) * 0.03;
       groupRef.current.position.y = Math.sin(t * 0.5) * 0.05;
     }
-    // Knob slow rotation
     if (knobRef.current) {
-      setKnobAngle((prev) => prev + 0.005);
-      knobRef.current.rotation.z = knobAngle;
+      knobRef.current.rotation.z = t * 0.3;
     }
-    // Card bobbing
     if (cardRef.current) {
-      const t = state.clock.elapsedTime;
       cardRef.current.position.y = 1.72 + Math.sin(t * 1.5) * 0.06;
     }
   });
@@ -64,14 +58,14 @@ function CheekDevice({ isHovered }) {
         </mesh>
       </group>
 
-      {/* LEDs */}
+      {/* LEDs — static emissive (no Date.now() per-frame recalc) */}
       {[-0.18, 0, 0.18].map((x, i) => (
         <mesh key={i} position={[x, 0.85, 0.25]}>
-          <sphereGeometry args={[0.04, 16, 16]} />
+          <sphereGeometry args={[0.04, 8, 8]} />
           <meshStandardMaterial
             color={accentOrange}
             emissive={accentOrange}
-            emissiveIntensity={1.5 + Math.sin(Date.now() * 0.003 + i) * 0.5}
+            emissiveIntensity={1.5}
             roughness={0.2}
           />
         </mesh>
@@ -95,7 +89,7 @@ function CheekDevice({ isHovered }) {
       {/* Knob */}
       <group position={[0, -0.2, 0.25]} ref={knobRef}>
         <mesh>
-          <cylinderGeometry args={[0.2, 0.2, 0.1, 32]} />
+          <cylinderGeometry args={[0.2, 0.2, 0.1, 16]} />
           <meshStandardMaterial color={accentOrange} roughness={0.3} metalness={0.7} />
         </mesh>
         {/* Knob indicator dot */}
@@ -171,20 +165,15 @@ export default function Device3D({ className = '' }) {
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
       >
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[5, 5, 5]} intensity={1.2} castShadow />
+        <ambientLight intensity={0.7} />
+        <directionalLight position={[5, 5, 5]} intensity={1.2} />
         <directionalLight position={[-3, 2, 4]} intensity={0.5} color="#FFD503" />
-        <pointLight position={[0, -1, 3]} intensity={0.4} color="#D4870E" />
 
         <CheekDevice isHovered={hovered} />
 
-        {/* Floating cards */}
+        {/* Floating cards — reduced from 3 to 2 */}
         <FloatingCard position={[-1.8, 0.8, -0.5]} color="#FF6B8A" rotation={[0, 0.3, -0.1]} />
         <FloatingCard position={[1.9, 0.3, -0.3]} color="#7C5CFC" rotation={[0, -0.2, 0.1]} />
-        <FloatingCard position={[-1.5, -0.7, -0.2]} color="#00C9A7" rotation={[0, 0.2, 0.15]} />
-
-        <ContactShadows position={[0, -1.5, 0]} opacity={0.3} scale={4} blur={2.5} far={4} />
-        <Environment preset="city" />
       </Canvas>
     </div>
   );

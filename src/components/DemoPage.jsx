@@ -5,7 +5,7 @@ import RFIDCard from './RFIDCard';
 import cardContent, { allCardIds } from '../data/cardContent';
 import '../styles/DemoPage.css';
 
-const LANG_MAP = { en: 'en-US', hi: 'hi-IN', te: 'te-IN', ta: 'ta-IN' };
+const LANG_MAP = { en: 'en-US', hi: 'hi-IN', te: 'te-IN', ta: 'ta-IN', kn: 'kn-IN', ml: 'ml-IN', mr: 'mr-IN', bn: 'bn-IN' };
 
 export default function DemoPage({ userName, userLang, onBack, onCart }) {
   const [insertedCard, setInsertedCard] = useState(null);
@@ -377,7 +377,7 @@ function FlyingCardArc({ flying }) {
       }}
     >
       {data.cardImage ? (
-        <img src={data.cardImage} alt="" className="flying-card-img" draggable={false} />
+        <img src={data.cardImage} alt="" className="flying-card-img" draggable={false} loading="eager" decoding="async" />
       ) : (
         <div className="flying-card-gradient" style={{ background: data.bg }}>
           <span>{data.icon}</span>
@@ -413,7 +413,7 @@ function DroppingCard({ dropping }) {
       }}
     >
       {data.cardImage ? (
-        <img src={data.cardImage} alt="" className="flying-card-img" draggable={false} />
+        <img src={data.cardImage} alt="" className="flying-card-img" draggable={false} loading="eager" decoding="async" />
       ) : (
         <div className="flying-card-gradient" style={{ background: data.bg }}>
           <span>{data.icon}</span>

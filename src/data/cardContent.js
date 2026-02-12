@@ -4,7 +4,7 @@ const cardContent = {
     icon: "\u{1F3B5}",
     color: "#FF6B8A",
     bg: "linear-gradient(135deg, #FF6B8A, #FF8FA3)",
-    cardImage: "/Temp 1/Rhymes.png",
+    cardImage: "/Temp 1/Rhymes.webp",
     items: {
       en: [
         { title: "Twinkle Star", text: "Twinkle twinkle little star, how I wonder what you are...", speech: "Twinkle twinkle little star, how I wonder what you are. Up above the world so high, like a diamond in the sky." },
@@ -25,7 +25,7 @@ const cardContent = {
     icon: "\u{1F4DA}",
     color: "#7C5CFC",
     bg: "linear-gradient(135deg, #7C5CFC, #9B8AFF)",
-    cardImage: "/Temp 2/Rhymes.png",
+    cardImage: "/Temp 2/Rhymes.webp",
     items: {
       en: [
         { title: "The Clever Fox", text: "Once upon a time, a clever fox found a magical forest...", speech: "Once upon a time, a clever fox found a magical forest where all the animals lived happily together." },
@@ -46,7 +46,7 @@ const cardContent = {
     icon: "\u{1F170}",
     color: "#00C9A7",
     bg: "linear-gradient(135deg, #00C9A7, #4DDBBD)",
-    cardImage: "/Temp 3/Rhymes.png",
+    cardImage: "/Temp 3/Rhymes.webp",
     items: {
       en: [
         { title: "A is for Apple", text: "A is for Apple\nB is for Ball\nC is for Cat", speech: "A is for Apple. B is for Ball. C is for Cat. Can you say them with me?" },
@@ -61,7 +61,7 @@ const cardContent = {
     icon: "\u{1F522}",
     color: "#FFB830",
     bg: "linear-gradient(135deg, #FFB830, #FFD166)",
-    cardImage: "/Temp 4/Rhymes.png",
+    cardImage: "/Temp 4/Rhymes.webp",
     items: {
       en: [
         { title: "Count to 5", text: "1 - One\n2 - Two\n3 - Three\n4 - Four\n5 - Five", speech: "Let's count together! One, two, three, four, five! Great counting!" },
@@ -76,7 +76,7 @@ const cardContent = {
     icon: "\u{1F43B}",
     color: "#2DC653",
     bg: "linear-gradient(135deg, #2DC653, #5EE882)",
-    cardImage: "/Temp 3/Rhymes-1.png",
+    cardImage: "/Temp 3/Rhymes-1.webp",
     items: {
       en: [
         { title: "Farm Animals", text: "Cow goes Moo!\nSheep goes Baa!\nChicken goes Cluck!", speech: "Let's learn animal sounds! The cow goes moo! The sheep goes baa! The chicken goes cluck cluck!" },
@@ -91,7 +91,7 @@ const cardContent = {
     icon: "\u{1F3A7}",
     color: "#FF8C42",
     bg: "linear-gradient(135deg, #FF8C42, #FFB07C)",
-    cardImage: "/Temp 1/Rhymes  Back side.png",
+    cardImage: "/Temp 1/Rhymes  Back side.webp",
     items: {
       en: [
         { title: "Do Re Mi", text: "Do, Re, Mi, Fa, Sol, La, Ti, Do!\nSing along with us!", speech: "Let's sing the musical scale! Do, re, mi, fa, sol, la, ti, do! Beautiful singing!" },

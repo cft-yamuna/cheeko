@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(powershell \"ls -r ''C:\\\\Users\\\\abrah\\\\Desktop\\\\all-activities\\\\cheeko-new-website\\\\public'' -Include *.png,*.jpg,*.jpeg | ft FullName,Length\")",
+      "Bash(npx --yes sharp-cli:*)",
+      "Bash(npx sharp-cli:*)",
+      "Bash(npm install:*)",
+      "Bash(npx vite build)"
+    ]
+  }
+}
