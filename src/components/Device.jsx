@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import cardContent from '../data/cardContent';
 
-const PARTICLE_COLORS = ['#FFD503', '#E8423F', '#FF8C42', '#7C5CFC', '#00C9A7', '#FF6B8A'];
+const PARTICLE_COLORS = ['#FFD503', '#5A8A9A', '#FF8C42', '#3D6575', '#00C9A7', '#FF6B8A'];
 
 export default function Device({ insertedCard, contentIndex, isPlaying, onKnobClick, lang, isReceiving }) {
   const [ledsActive, setLedsActive] = useState(false);
@@ -133,23 +133,34 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
             )}
           </div>
 
-          {/* Dark circular knob - centered */}
+          {/* Dark circular knob - centered with rotation arrows */}
           <div className="device-knob-area">
-            <div
-              className={`knob ${!insertedCard ? 'disabled' : ''}`}
-              title="Click to play next content"
-              role="button"
-              tabIndex={insertedCard ? 0 : -1}
-              aria-label="Play next content"
-              onClick={handleKnobClick}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleKnobClick(); } }}
-              style={{ transform: `rotate(${knobRotation}deg)` }}
-            >
-              <div className="knob-ring" />
-              <div className="knob-center" />
-              <div className="knob-indicator" />
+            <div className="knob-wrapper">
+              {/* Left curved arrow — arcs up along left side */}
+              <svg className="knob-arrow knob-arrow-left" width="20" height="60" viewBox="0 0 20 60" fill="none" aria-hidden="true">
+                <path d="M14 55 A22 22 0 0 1 14 5" stroke="rgba(255,255,255,0.45)" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                <path d="M10 10 L14 3 L18 10" stroke="rgba(255,255,255,0.45)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+              </svg>
+              <div
+                className={`knob ${!insertedCard ? 'disabled' : ''}`}
+                title="Click to play next content"
+                role="button"
+                tabIndex={insertedCard ? 0 : -1}
+                aria-label="Play next content"
+                onClick={handleKnobClick}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleKnobClick(); } }}
+                style={{ transform: `rotate(${knobRotation}deg)` }}
+              >
+                <div className="knob-ring" />
+                <div className="knob-center" />
+                <div className="knob-indicator" />
+              </div>
+              {/* Right curved arrow — arcs down along right side */}
+              <svg className="knob-arrow knob-arrow-right" width="20" height="60" viewBox="0 0 20 60" fill="none" aria-hidden="true">
+                <path d="M6 5 A22 22 0 0 1 6 55" stroke="rgba(255,255,255,0.45)" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                <path d="M2 50 L6 57 L10 50" stroke="rgba(255,255,255,0.45)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+              </svg>
             </div>
-            <div className="knob-label">NEXT &#8635;</div>
           </div>
 
           {/* Speaker grille - round shape lines */}
