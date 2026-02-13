@@ -194,7 +194,7 @@ export default function LandingPage({ onStartDemo, onCart }) {
                   </div>
 
                   <div className="modal-device-showcase">
-                    <img src="/1.jpeg" alt="Cheeko Device" className="modal-device-img" draggable={false} />
+                    <img src="/1.png" alt="Cheeko Device" className="modal-device-img" draggable={false} />
                     <span className="modal-device-ring" />
                   </div>
 

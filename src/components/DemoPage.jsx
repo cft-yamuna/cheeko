@@ -76,7 +76,7 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
     const flyW = cardRect.width * 0.7;
     const flyH = cardRect.height * 0.7;
     setFlyingCard({ cardId, startX, startY, endX, endY, width: flyW, height: flyH });
-    setTimeout(() => { setFlyingCard(null); onDone(); }, 2100);
+    setTimeout(() => { setFlyingCard(null); onDone(); }, 1500);
   }, []);
 
   const dropCardIntoDevice = useCallback((cardId, dropPoint, onDone) => {
@@ -91,7 +91,7 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
       slotX, slotY,
       width: 80, height: 110,
     });
-    setTimeout(() => { setDroppingCard(null); onDone(); }, 1600);
+    setTimeout(() => { setDroppingCard(null); onDone(); }, 1300);
   }, []);
 
   const handleCardClick = useCallback((cardId, cardEl) => {
@@ -180,18 +180,28 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
                 transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
               >
                 <div className="shelf-info-header">What's on Screen?</div>
-                <div className="shelf-info-preview">
-                  {currentItem ? (
-                    <>
-                      <span className="shelf-info-title">{currentItem.title}</span>
-                      <span className="shelf-info-body">{currentItem.text}</span>
-                    </>
-                  ) : (
-                    <span className="shelf-info-empty">Loading...</span>
-                  )}
-                </div>
-                <div className="shelf-info-track">
-                  {contentIndex + 1} / {currentItems.length}
+                <div className="shelf-info-content">
+                  <div className="shelf-info-text">
+                    {currentItem ? (
+                      <>
+                        <span className="shelf-info-title">{currentItem.title}</span>
+                        <span className="shelf-info-body">{currentItem.text}</span>
+                      </>
+                    ) : (
+                      <span className="shelf-info-empty">Loading...</span>
+                    )}
+                  </div>
+                  <div className="shelf-info-right">
+                    {currentData?.cardImage && (
+                      <img className="shelf-info-img" src={currentData.cardImage} alt="" draggable={false} />
+                    )}
+                    <div className="shelf-info-progress-bar">
+                      <div
+                        className="shelf-info-progress-fill"
+                        style={{ width: `${((contentIndex + 1) / currentItems.length) * 100}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             ) : (
@@ -223,9 +233,18 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
       {/* Header */}
       <header className="demo-header">
         <span className="demo-header-logo">Cheek<span className="logo-o">o</span></span>
-        <button className="demo-hamburger" onClick={handleBack} aria-label="Go back">
-          <span /><span /><span />
-        </button>
+        <div className="demo-header-right">
+          <button className="demo-cart-btn" onClick={onCart} aria-label="Add to cart">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            <span>Add to Cart</span>
+          </button>
+          <button className="demo-hamburger" onClick={handleBack} aria-label="Go back">
+            <span /><span /><span />
+          </button>
+        </div>
       </header>
 
       {/* Main Content */}
@@ -238,9 +257,11 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
 
           {/* CENTER: Device + Instructions */}
           <div className="device-center">
-            <p className="device-instruction-top">
-              Click a card to play a story for <strong>{userName}</strong>!
-            </p>
+            {!insertedCard && (
+              <p className="device-instruction-top">
+                Click a card to play a story for <strong>{userName}</strong>!
+              </p>
+            )}
 
             <motion.div
               ref={deviceRef}
@@ -271,6 +292,11 @@ export default function DemoPage({ userName, userLang, onBack, onCart }) {
         </div>
       </main>
 
+      {/* Footer bar */}
+      <footer className="demo-footer">
+        <span>Click a card to play a story for <strong>{userName}</strong></span>
+      </footer>
+
       {/* Flying card arc animation (click) */}
       <AnimatePresence>
         {flyingCard && (
@@ -293,22 +319,28 @@ function FlyingCardArc({ flying }) {
   const data = cardContent[cardId];
   const dx = endX - startX;
   const dy = endY - startY;
-  const arcLift = -80;
 
   return (
     <motion.div
       className="flying-card-arc"
       style={{ width, height, left: startX - width / 2, top: startY - height / 2 }}
-      initial={{ x: 0, y: 0, scale: 1, opacity: 1 }}
+      initial={{ x: 0, y: 0, scale: 1, opacity: 1, clipPath: 'inset(0 0 0% 0)' }}
       animate={{
-        x: [0, dx * 0.5, dx, dx, dx],
-        y: [0, dy * 0.4 + arcLift, dy, dy + 30, dy + 55],
-        scale: [1, 0.72, 0.55, 0.4, 0.2],
-        scaleX: [1, 0.8, 0.65, 0.45, 0.25],
-        opacity: [1, 1, 1, 0.6, 0],
+        x: [0, dx, dx],
+        y: [0, dy - 20, dy + 60],
+        scale: [1, 0.8, 0.8],
+        opacity: [1, 1, 1],
+        clipPath: ['inset(0 0 0% 0)', 'inset(0 0 0% 0)', 'inset(0 0 100% 0)'],
       }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 2.0, times: [0, 0.55, 0.7, 0.88, 1], ease: 'easeInOut' }}
+      transition={{
+        duration: 1.2,
+        times: [0, 0.65, 1],
+        x: { duration: 1.2, times: [0, 0.65, 1], ease: 'linear' },
+        y: { duration: 1.2, times: [0, 0.65, 1], ease: [0.25, -0.3, 0.5, 1] },
+        scale: { duration: 1.2, times: [0, 0.65, 1], ease: 'linear' },
+        clipPath: { duration: 1.2, times: [0, 0.65, 1], ease: 'linear' },
+      }}
     >
       {data.cardImage ? (
         <img src={data.cardImage} alt="" className="flying-card-img" draggable={false} loading="eager" decoding="async" />
@@ -331,16 +363,23 @@ function DroppingCard({ dropping }) {
     <motion.div
       className="flying-card-arc"
       style={{ width, height, left: startX - width / 2, top: startY - height / 2 }}
-      initial={{ x: 0, y: 0, scale: 0.8, opacity: 1 }}
+      initial={{ x: 0, y: 0, scale: 0.8, opacity: 1, clipPath: 'inset(0 0 0% 0)' }}
       animate={{
-        x: [0, dx * 0.6, dx, dx, dx],
-        y: [0, dy * 0.5, dy, dy + 30, dy + 55],
-        scale: [0.8, 0.6, 0.5, 0.38, 0.18],
-        scaleX: [1, 0.8, 0.65, 0.45, 0.25],
-        opacity: [1, 1, 1, 0.6, 0],
+        x: [0, dx, dx],
+        y: [0, dy - 20, dy + 60],
+        scale: [0.8, 0.8, 0.8],
+        opacity: [1, 1, 1],
+        clipPath: ['inset(0 0 0% 0)', 'inset(0 0 0% 0)', 'inset(0 0 100% 0)'],
       }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 1.5, times: [0, 0.45, 0.65, 0.85, 1], ease: 'easeInOut' }}
+      transition={{
+        duration: 1.2,
+        times: [0, 0.65, 1],
+        x: { duration: 1.2, times: [0, 0.65, 1], ease: 'linear' },
+        y: { duration: 1.2, times: [0, 0.65, 1], ease: [0.25, -0.3, 0.5, 1] },
+        scale: { duration: 1.2, times: [0, 0.65, 1], ease: 'linear' },
+        clipPath: { duration: 1.2, times: [0, 0.65, 1], ease: 'linear' },
+      }}
     >
       {data.cardImage ? (
         <img src={data.cardImage} alt="" className="flying-card-img" draggable={false} loading="eager" decoding="async" />

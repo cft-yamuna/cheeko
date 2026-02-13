@@ -58,7 +58,7 @@ export default function CartPage({ onBack }) {
               transition={{ delay: 0.1 }}
             >
               <div className="product-image-wrap">
-                <img src="/1.jpeg" alt="Cheeko AI Device" className="product-img" width="280" height="280" loading="lazy" />
+                <img src="/1.png" alt="Cheeko AI Device" className="product-img" width="280" height="280" loading="lazy" />
               </div>
               <div className="product-details">
                 <h2 className="product-name">Cheeko AI Learning Device</h2>

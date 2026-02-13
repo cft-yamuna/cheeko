@@ -20,6 +20,7 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
 
   useEffect(() => {
     if (insertedCard && insertedCard !== prevCardRef.current) {
+      setKnobRotation(0);
       setCardAnim('animating');
       // Staggered reveal: LEDs → screen on → particles → done
       const t1 = setTimeout(() => setLedsActive(true), 350);
@@ -30,6 +31,7 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
       return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
     }
     if (!insertedCard && prevCardRef.current) {
+      setKnobRotation(0);
       setCardAnim('ejecting');
       setLedsActive(false);
       setScreenOn(false);
@@ -126,40 +128,36 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
             )}
             {screenOn && currentItem && (
               <div className={`screen-content ${changing ? 'changing' : ''}`}>
-                <div className="content-title">{currentItem.title}</div>
-                <div className="content-body">{currentItem.text}</div>
-                <div className="content-index">{contentIndex + 1} / {items.length}</div>
+                {data?.cardImage && (
+                  <img className="screen-full-img" src={data.cardImage} alt="" draggable={false} />
+                )}
+                <div className="screen-lyrics-overlay">
+                  <span className="content-title">{currentItem.title}</span>
+                  <div className="content-lyrics-scroll-wrap">
+                    <span className={`content-lyrics ${isPlaying ? 'scrolling' : ''}`} key={contentIndex}>
+                      {currentItem.speech || currentItem.text}
+                    </span>
+                  </div>
+                </div>
               </div>
             )}
           </div>
 
           {/* Dark circular knob - centered with rotation arrows */}
           <div className="device-knob-area">
-            <div className="knob-wrapper">
-              {/* Left curved arrow — arcs up along left side */}
-              <svg className="knob-arrow knob-arrow-left" width="20" height="60" viewBox="0 0 20 60" fill="none" aria-hidden="true">
-                <path d="M14 55 A22 22 0 0 1 14 5" stroke="rgba(255,255,255,0.45)" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-                <path d="M10 10 L14 3 L18 10" stroke="rgba(255,255,255,0.45)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-              </svg>
-              <div
-                className={`knob ${!insertedCard ? 'disabled' : ''}`}
-                title="Click to play next content"
-                role="button"
-                tabIndex={insertedCard ? 0 : -1}
-                aria-label="Play next content"
-                onClick={handleKnobClick}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleKnobClick(); } }}
-                style={{ transform: `rotate(${knobRotation}deg)` }}
-              >
-                <div className="knob-ring" />
-                <div className="knob-center" />
-                <div className="knob-indicator" />
-              </div>
-              {/* Right curved arrow — arcs down along right side */}
-              <svg className="knob-arrow knob-arrow-right" width="20" height="60" viewBox="0 0 20 60" fill="none" aria-hidden="true">
-                <path d="M6 5 A22 22 0 0 1 6 55" stroke="rgba(255,255,255,0.45)" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-                <path d="M2 50 L6 57 L10 50" stroke="rgba(255,255,255,0.45)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-              </svg>
+            <div
+              className={`knob ${!insertedCard ? 'disabled' : ''}`}
+              title="Click to play next content"
+              role="button"
+              tabIndex={insertedCard ? 0 : -1}
+              aria-label="Play next content"
+              onClick={handleKnobClick}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleKnobClick(); } }}
+              style={{ transform: `rotate(${knobRotation}deg)` }}
+            >
+              <div className="knob-ring" />
+              <div className="knob-center" />
+              <div className="knob-indicator" />
             </div>
           </div>
 
