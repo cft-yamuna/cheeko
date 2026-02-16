@@ -168,7 +168,6 @@
 }
 
 .rfid-card.inserted {
-  opacity: 0.3;
   pointer-events: none;
   transform: scale(0.95);
 }
@@ -285,7 +284,7 @@
     0 20px 60px rgba(0,0,0,0.6),
     inset 0 1px 0 rgba(255,255,255,0.1),
     0 0 100px rgba(212, 135, 14, 0.05);
-  overflow: visible;
+  
   padding: 10px;
 }
 

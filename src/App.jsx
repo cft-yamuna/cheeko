@@ -1,13 +1,9 @@
 import { useState, useEffect } from 'react';
-import LandingPage from './components/LandingPage';
 import DemoPage from './components/DemoPage';
 import CartPage from './components/CartPage';
 
 function App() {
-  const [page, setPage] = useState('landing'); // 'landing' | 'demo' | 'cart'
-  const [userName, setUserName] = useState('');
-  const [userLang, setUserLang] = useState('en');
-  const [prevPage, setPrevPage] = useState('landing');
+  const [page, setPage] = useState('demo'); // 'demo' | 'cart'
 
   useEffect(() => {
     if ('speechSynthesis' in window) {
@@ -16,15 +12,7 @@ function App() {
     }
   }, []);
 
-  const handleStartDemo = ({ name, lang }) => {
-    setUserName(name);
-    setUserLang(lang);
-    setPage('demo');
-    window.scrollTo(0, 0);
-  };
-
-  const goToCart = (from) => {
-    setPrevPage(from || page);
+  const goToCart = () => {
     setPage('cart');
     window.scrollTo(0, 0);
   };
@@ -32,23 +20,16 @@ function App() {
   if (page === 'cart') {
     return (
       <CartPage
-        onBack={() => { setPage(prevPage); window.scrollTo(0, 0); }}
+        onBack={() => { setPage('demo'); window.scrollTo(0, 0); }}
       />
     );
   }
 
-  if (page === 'demo') {
-    return (
-      <DemoPage
-        userName={userName}
-        userLang={userLang}
-        onBack={() => { setPage('landing'); window.scrollTo(0, 0); }}
-        onCart={() => goToCart('demo')}
-      />
-    );
-  }
-
-  return <LandingPage onStartDemo={handleStartDemo} onCart={() => goToCart('landing')} />;
+  return (
+    <DemoPage
+      onCart={goToCart}
+    />
+  );
 }
 
 export default App;

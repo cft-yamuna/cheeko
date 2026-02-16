@@ -126,19 +126,11 @@ export default function Device({ insertedCard, contentIndex, isPlaying, onKnobCl
             {!screenOn && (
               <div className="screen-off-text">Insert a card</div>
             )}
-            {screenOn && currentItem && (
+            {screenOn && data && (
               <div className={`screen-content ${changing ? 'changing' : ''}`}>
-                {data?.cardImage && (
+                {data.cardImage && (
                   <img className="screen-full-img" src={data.cardImage} alt="" draggable={false} />
                 )}
-                <div className="screen-lyrics-overlay">
-                  <span className="content-title">{currentItem.title}</span>
-                  <div className="content-lyrics-scroll-wrap">
-                    <span className={`content-lyrics ${isPlaying ? 'scrolling' : ''}`} key={contentIndex}>
-                      {currentItem.speech || currentItem.text}
-                    </span>
-                  </div>
-                </div>
               </div>
             )}
           </div>

@@ -12,7 +12,9 @@
       "Bash(timeout 8 npm run dev:*)",
       "Bash(npm run build:*)",
       "Bash(copy:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(timeout:*)",
+      "Bash(ping:*)"
     ]
   }
 }
